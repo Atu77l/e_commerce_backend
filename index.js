@@ -3,6 +3,7 @@ const cors = require("cors");
 const connectDB = require("./db/config");
 const User = require('./db/User');
 const Product = require("./db/Product")
+const Order = require("./db/Order");
 const Jwt = require('jsonwebtoken');
 const jwtKey = 'e-com';
 const app = express();
@@ -48,6 +49,11 @@ app.post("/add-product", async (req, res) => {
     let result = await product.save();
     res.send(result);
 });
+app.post("/orderProduct", async (req, res) => {
+    let order = new Order(req.body);
+    let result = await order.save();
+    res.send(result);
+});
 
 app.get("/products", async (req, res) => {
     const products = await Product.find();
@@ -57,9 +63,21 @@ app.get("/products", async (req, res) => {
         res.send({ result: "No Product found" })
     }
 });
+app.get("/order", async (req, res) => {
+    const order = await Order.find();
+    if (order.length > 0) {
+        res.send(order)
+    } else {
+        res.send({ result: "No Product found" })
+    }
+});
 
 app.delete("/product/:id", async (req, res) => {
     let result = await Product.deleteOne({ _id: req.params.id });
+    res.send(result)
+}),
+app.delete("/order/:id", async (req, res) => {
+    let result = await Order.deleteOne({ _id: req.params.id });
     res.send(result)
 }),
 
@@ -104,5 +122,6 @@ app.get("/search/:key", async (req, res) => {
     });
     res.send(result);
 })
+
 
 app.listen(process.env.PORT || 5000);
